@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Early Six Bet Calculator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .input-field {
+            transition: all 0.3s ease;
+        }
+        .input-field:focus {
+            border-color: #f59e0b;
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2);
+        }
+        .tab-active {
+            transform: scale(1.02);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .logo {
+            background: linear-gradient(135deg, #f59e0b 0%, #f97316 100%);
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-100 min-h-screen flex flex-col items-center justify-start pt-8 pb-10 px-4">
+    <!-- Stake Logo in Top Left Corner -->
+    <div class="absolute top-4 left-4">
+        <div class="bg-gray-900 p-1 rounded">
+            <img src="https://dieppeconservatoire.fr/wp-content/uploads/2025/01/stake-logo-white.png" alt="Stake Logo" class="h-10 object-contain">
+        </div>
+    </div>
+
+    <div class="max-w-md w-full mx-auto mt-12">
+        <!-- Header Section with Logo -->
+        <div class="flex items-center justify-center mb-6">
+            <div class="logo w-16 h-16 rounded-xl flex items-center justify-center shadow-lg mr-3">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+            </div>
+            <h1 class="text-3xl font-bold text-yellow-400">
+                Early Six Calculator
+            </h1>
+        </div>
+        
+        <!-- Tab Navigation with Reset Button -->
+        <div class="flex items-center mb-6">
+            <div class="flex space-x-2 bg-gray-800 p-1 rounded-lg flex-grow">
+                <button class="tab flex-1 py-3 px-4 rounded-md font-medium transition-all duration-200" 
+                        onclick="showTab('amount')" id="amountTab">
+                    By Bet Split
+                </button>
+                <button class="tab flex-1 py-3 px-4 rounded-md font-medium transition-all duration-200" 
+                        onclick="showTab('payout')" id="payoutTab">
+                    By Payout
+                </button>
+            </div>
+            <button class="ml-2 bg-gray-700 hover:bg-gray-600 text-white font-medium p-3 rounded-lg transition-all duration-200"
+                    onclick="resetAll()" title="Reset All">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+            </button>
+        </div>
+        
+        <!-- By Amount Calculator -->
+        <div id="amount" class="container bg-gray-800 p-6 rounded-xl shadow-lg mb-6">
+            <h3 class="text-lg font-semibold text-yellow-400 mb-4">Calculate by Bet Amount</h3>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-1">Total Amount (₹)</label>
+                    <input type="number" id="totalAmount" 
+                           class="input-field w-full p-3 rounded-lg bg-gray-700 text-white border border-gray-600 focus:outline-none">
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-1">Team 1 Odds</label>
+                        <input type="number" step="0.1" id="ratio1" 
+                               class="input-field w-full p-3 rounded-lg bg-gray-700 text-white border border-gray-600 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-1">Team 2 Odds</label>
+                        <input type="number" step="0.1" id="ratio2" 
+                               class="input-field w-full p-3 rounded-lg bg-gray-700 text-white border border-gray-600 focus:outline-none">
+                    </div>
+                </div>
+                
+                <button class="w-full bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-bold py-3 px-4 rounded-lg transition-all duration-200 mt-2"
+                        onclick="calculateByAmount()">
+                    Calculate Split
+                </button>
+                
+                <div class="mt-6 space-y-3">
+                    <div id="resultByAmount" class="text-center p-3 bg-gray-750 rounded-lg"></div>
+                    <div id="stakeByAmount" class="text-center p-3 bg-gray-750 rounded-lg"></div>
+                    <div id="profitByAmount" class="text-center p-3 bg-gray-750 rounded-lg"></div>
+                    <div id="lossByAmount" class="text-center p-3 bg-gray-750 rounded-lg"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- By Payout Calculator -->
+        <div id="payout" class="container bg-gray-800 p-6 rounded-xl shadow-lg hidden">
+            <h3 class="text-lg font-semibold text-yellow-400 mb-4">Calculate by Desired Payout</h3>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-1">Desired Payout (₹)</label>
+                    <input type="number" id="desiredPayout" 
+                           class="input-field w-full p-3 rounded-lg bg-gray-700 text-white border border-gray-600 focus:outline-none">
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-1">Team 1 Odds</label>
+                        <input type="number" step="0.1" id="ratio3" 
+                               class="input-field w-full p-3 rounded-lg bg-gray-700 text-white border border-gray-600 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-1">Team 2 Odds</label>
+                        <input type="number" step="0.1" id="ratio4" 
+                               class="input-field w-full p-3 rounded-lg bg-gray-700 text-white border border-gray-600 focus:outline-none">
+                    </div>
+                </div>
+                
+                <button class="w-full bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-bold py-3 px-4 rounded-lg transition-all duration-200 mt-2"
+                        onclick="calculateByPayout()">
+                    Calculate Bets
+                </button>
+                
+                <div class="mt-6 space-y-3">
+                    <div id="resultByPayout" class="text-center p-3 bg-gray-750 rounded-lg"></div>
+                    <div id="stakeByPayout" class="text-center p-3 bg-gray-750 rounded-lg"></div>
+                    <div id="profitByPayout" class="text-center p-3 bg-gray-750 rounded-lg"></div>
+                    <div id="lossByPayout" class="text-center p-3 bg-gray-750 rounded-lg"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Info Section -->
+        <div class="mt-6 text-center text-gray-400 text-sm">
+            <p>Optimize your early six bets by calculating the ideal split between two outcomes.</p>
+            <p class="mt-1">Odds should be in decimal format (e.g., 1.8, 2.5).</p>
+        </div>
+    </div>
+
+    <script>
+        // Initialize the page with first tab active
+        document.addEventListener('DOMContentLoaded', function() {
+            showTab('amount');
+        });
+
+        function showTab(tab) {
+            // Hide all containers
+            document.querySelectorAll('.container').forEach(container => {
+                container.classList.add('hidden');
+            });
+            
+            // Show selected container
+            document.getElementById(tab).classList.remove('hidden');
+            
+            // Update tab styles
+            document.querySelectorAll('.tab').forEach(tabEl => {
+                tabEl.classList.remove('bg-yellow-500', 'text-gray-900', 'tab-active');
+                tabEl.classList.add('bg-gray-750', 'text-gray-300');
+            });
+            
+            // Highlight active tab
+            document.getElementById(tab + 'Tab').classList.add('bg-yellow-500', 'text-gray-900', 'tab-active');
+            document.getElementById(tab + 'Tab').classList.remove('bg-gray-750', 'text-gray-300');
+        }
+        
+        function calculateByAmount() {
+            let total = parseFloat(document.getElementById("totalAmount").value);
+            let r1 = parseFloat(document.getElementById("ratio1").value);
+            let r2 = parseFloat(document.getElementById("ratio2").value);
+            
+            if (isNaN(total) || isNaN(r1) || isNaN(r2) || total <= 0 || r1 <= 0 || r2 <= 0) {
+                alert("Please enter valid positive numbers for all fields");
+                return;
+            }
+            
+            let x = (total * r2) / (r1 + r2);
+            let y = total - x;
+            let payout1 = x * r1;
+            let payout2 = y * r2;
+            let totalPayout = payout1 + payout2;
+            let maxProfit = (totalPayout - total).toFixed(2);
+            let loss = (total - Math.min(payout1, payout2)).toFixed(2);
+            
+            document.getElementById("resultByAmount").innerHTML = `
+                <div class="flex justify-between mb-1">
+                    <span class="text-gray-300">Team 1 Bet:</span>
+                    <span class="font-bold text-yellow-400">₹${x.toFixed(2)}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-gray-300">Team 2 Bet:</span>
+                    <span class="font-bold text-yellow-400">₹${y.toFixed(2)}</span>
+                </div>
+            `;
+            
+            document.getElementById("stakeByAmount").innerHTML = `
+                <div class="flex justify-between">
+                    <span class="text-gray-300">Total Stake:</span>
+                    <span class="font-bold text-green-400">₹${total.toFixed(2)}</span>
+                </div>
+            `;
+            
+            document.getElementById("profitByAmount").innerHTML = `
+                <div class="flex justify-between">
+                    <span class="text-gray-300">Max Profit:</span>
+                    <span class="font-bold text-blue-400">₹${maxProfit} (${((maxProfit/total)*100).toFixed(2)}%)</span>
+                </div>
+                <div class="text-xs text-gray-400 mt-1">Calculation: (Team1 Payout + Team2 Payout - Total Stake)</div>
+            `;
+            
+            document.getElementById("lossByAmount").innerHTML = `
+                <div class="flex justify-between">
+                    <span class="text-gray-300">Potential Loss:</span>
+                    <span class="font-bold text-red-400">₹${loss} (${((loss/total)*100).toFixed(2)}%)</span>
+                </div>
+                <div class="text-xs text-gray-400 mt-1">Calculation: (Total stake - Lower payout)</div>
+            `;
+        }
+        
+        function calculateByPayout() {
+            let payout = parseFloat(document.getElementById("desiredPayout").value);
+            let r1 = parseFloat(document.getElementById("ratio3").value);
+            let r2 = parseFloat(document.getElementById("ratio4").value);
+            
+            if (isNaN(payout) || isNaN(r1) || isNaN(r2) || payout <= 0 || r1 <= 0 || r2 <= 0) {
+                alert("Please enter valid positive numbers for all fields");
+                return;
+            }
+            
+            let x = payout / r1;
+            let y = payout / r2;
+            let total = x + y;
+            let totalPayout = payout * 2; // Since both bets are designed to return the same payout
+            let maxProfit = (totalPayout - total).toFixed(2);
+            let loss = (total - payout).toFixed(2);
+            
+            document.getElementById("resultByPayout").innerHTML = `
+                <div class="flex justify-between mb-1">
+                    <span class="text-gray-300">Team 1 Bet:</span>
+                    <span class="font-bold text-yellow-400">₹${x.toFixed(2)}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-gray-300">Team 2 Bet:</span>
+                    <span class="font-bold text-yellow-400">₹${y.toFixed(2)}</span>
+                </div>
+            `;
+            
+            document.getElementById("stakeByPayout").innerHTML = `
+                <div class="flex justify-between">
+                    <span class="text-gray-300">Total Stake:</span>
+                    <span class="font-bold text-green-400">₹${total.toFixed(2)}</span>
+                </div>
+            `;
+            
+            document.getElementById("profitByPayout").innerHTML = `
+                <div class="flex justify-between">
+                    <span class="text-gray-300">Max Profit:</span>
+                    <span class="font-bold text-blue-400">₹${maxProfit} (${((maxProfit/total)*100).toFixed(2)}%)</span>
+                </div>
+                <div class="text-xs text-gray-400 mt-1">Calculation: (Team1 Payout + Team2 Payout - Total Stake)</div>
+            `;
+            
+            document.getElementById("lossByPayout").innerHTML = `
+                <div class="flex justify-between">
+                    <span class="text-gray-300">Potential Loss:</span>
+                    <span class="font-bold text-red-400">₹${loss} (${((loss/total)*100).toFixed(2)}%)</span>
+                </div>
+                <div class="text-xs text-gray-400 mt-1">Calculation: (Total stake - Payout)</div>
+            `;
+        }
+        
+        function resetAll() {
+            // Clear all inputs
+            document.querySelectorAll('input').forEach(input => input.value = "");
+            
+            // Clear all results
+            document.querySelectorAll('[id^="result"], [id^="loss"], [id^="stake"], [id^="profit"]').forEach(div => div.innerHTML = "");
+            
+            // Return to first tab
+            showTab('amount');
+        }
+    </script>
+</body>
+</html>
